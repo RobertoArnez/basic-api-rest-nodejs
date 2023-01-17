@@ -20,30 +20,18 @@ class TodoModel {
   constructor() {
     this.todos = [];
   }
+
   async getTodos(){
     const res = await client.query('select * from todos');
     console.log(res);
     return res.rows;
   }
 
-
   async  addTodo(todoText) {
     const query = 'INSERT INTO todos(id, task) VALUES($1, $2) RETURNING *';
     const values = [Math.floor(1000 + Math.random() * 9000), todoText];
     const res = await client.query(query, values);
     return res;
-  }
-
-  editTodo(index, todoText) {
-    this.todos[index].text = todoText;
-  }
-
-  deleteTodo(index) {
-    this.todos.splice(index, 1);
-  }
-
-  toggleTodo(index) {
-    this.todos[index].completed = !this.todos[index].completed;
   }
 }
 
@@ -59,18 +47,6 @@ class TodoController {
 
   async addTodo(todoText) {
     await this.model.addTodo(todoText);
-  }
-
-  editTodo(index, todoText) {
-    this.model.editTodo(index, todoText);
-  }
-
-  deleteTodo(index) {
-    this.model.deleteTodo(index);
-  }
-
-  toggleTodo(index) {
-    this.model.toggleTodo(index);
   }
 }
 
@@ -91,25 +67,6 @@ app.post("/todos", (req, res) => {
   const todoText = req.body.text;
   console.log(req.body)
   todoController.addTodo(todoText);
-  res.sendStatus(200);
-});
-
-app.put("/todos/:index", (req, res) => {
-  const index = req.params.index;
-  const todoText = req.body.text;
-  todoController.editTodo(index, todoText);
-  res.sendStatus(200);
-});
-
-app.delete("/todos/:index", (req, res) => {
-  const index = req.params.index;
-  todoController.deleteTodo(index);
-  res.sendStatus(200);
-});
-
-app.patch("/todos/:index", (req, res) => {
-  const index = req.params.index;
-  todoController.toggleTodo(index);
   res.sendStatus(200);
 });
 
